@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather Checker</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1950&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    header {
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .overlay {
+      background-color: rgba(0, 0, 0, 0.4);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px; /* Add padding for smaller screens */
+      box-sizing: border-box;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      width: 90%;
+      max-width: 900px; /* Increased max-width to accommodate 7-day forecast */
+      backdrop-filter: blur(10px);
+      color: white;
+      display: flex; /* Use flexbox for main content */
+      flex-direction: column; /* Default to column for small screens */
+      gap: 20px; /* Gap between sections */
+    }
+    @media (min-width: 768px) {
+      .container {
+        flex-direction: row; /* Row direction for larger screens */
+        justify-content: space-around;
+        align-items: flex-start; /* Align items to the top */
+      }
+    }
+
+
+    h1 {
+      color: #ffffff;
+      margin-bottom: 15px;
+    }
+
+    input {
+      padding: 10px;
+      width: calc(100% - 20px); /* Adjust width for padding */
+      border: none;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-size: 1rem;
+    }
+
+    button {
+      background-color: #21b5a6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #009688;
+    }
+
+    .weather-main-section {
+      flex: 1; /* Allows this section to grow */
+      min-width: 300px; /* Minimum width for current weather and 3-hour forecast */
+    }
+
+    .weather-box {
+      margin-top: 20px;
+    }
+
+    .forecast-container {
+      display: flex;
+      justify-content: space-around;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .forecast-card {
+      background-color: rgba(255, 255, 255, 0.3);
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 100px;
+      backdrop-filter: blur(5px);
+      color: white;
+      flex-shrink: 0; /* Prevent cards from shrinking too much */
+    }
+
+    .forecast-time {
+      font-weight: bold;
+      font-size: 1rem;
+      margin-bottom: 5px;
+    }
+
+    .forecast-temp {
+      font-size: 1.4rem;
+      margin-bottom: 5px;
+    }
+
+    .forecast-condition {
+      font-size: 0.9rem;
+    }
+
+    .seven-day-forecast-section {
+      flex: 1.5; /* Allows this section to grow more */
+      min-width: 400px; /* Minimum width for 7-day forecast */
+      text-align: left;
+      margin-top: 20px; /* Add margin for column layout */
+    }
+
+    @media (min-width: 768px) {
+      .seven-day-forecast-section {
+        margin-top: 0; /* Remove top margin when in row layout */
+      }
+    }
+
+
+    .seven-day-forecast-section h2 {
+      color: #ffffff;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .seven-day-cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center; /* Center cards within the container */
+    }
+
+    .day-forecast-card {
+      background-color: rgba(255, 255, 255, 0.3);
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: calc(33% - 10px); /* 3 cards per row with gap, adjust as needed */
+      min-width: 120px; /* Minimum width for responsiveness */
+      backdrop-filter: blur(5px);
+      color: white;
+      box-sizing: border-box; /* Include padding in width */
+      flex-grow: 1; /* Allow cards to grow */
+    }
+
+    .day-forecast-card .date {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .day-forecast-card img {
+      width: 50px;
+      height: auto;
+      margin-bottom: 5px;
+    }
+
+    .day-forecast-card .avg-temp {
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+
+    .day-forecast-card .condition {
+      font-size: 0.85rem;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div id="liveClock">🕒 Loading time...</div>
+  </header>
+
+  <div class="overlay">
+    <div class="container">
+      <div class="weather-main-section">
+        <h1>🌦️ Weather Checker</h1>
+        <p style="font-style: italic; color: #e0f7fa; font-size: 0.95rem;">"Wherever you go, no matter what the weather, always bring your own sunshine."</p>
+        <input type="text" id="locationInput" placeholder="Enter a location (e.g., Paris)" />
+        <button onclick="getWeather()">Get Temperature & Forecast</button>
+        <div id="result" class="weather-box">
+          </div>
+      </div>
+
+      <div class="seven-day-forecast-section">
+        <h2>7-Day Forecast</h2>
+        <div id="sevenDayForecast" class="seven-day-cards-container">
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © <span id="year"></span> Weatherly · Built with ☀️ by You
+  </footer>
+
+  <script>
+    const API_KEY = "416570dda2d649bebb6134924250606";
+
+    function getWeather() {
+      const location = document.getElementById("locationInput").value.trim();
+      const resultDiv = document.getElementById("result");
+      const sevenDayForecastDiv = document.getElementById("sevenDayForecast");
+
+      if (!location) {
+        resultDiv.innerHTML = "Please enter a location.";
+        sevenDayForecastDiv.innerHTML = ""; // Clear 7-day forecast
+        return;
+      }
+
+      // Request 7 days of forecast data
+      const apiUrl = `http://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${encodeURIComponent(location)}&days=7&aqi=no&alerts=no`;
+
+      fetch(apiUrl)
+        .then(response => {
+          if (!response.ok) throw new Error("Location not found");
+          return response.json();
+        })
+        .then(data => {
+          // --- Current Weather and 3-Hour Forecast ---
+          const current = data.current;
+          const locationName = data.location.name;
+          const temp = current.temp_c;
+
+          let currentForecastOutput = `<p><strong>Current Temperature in ${locationName}</strong>: ${temp}°C</p>`;
+          currentForecastOutput += `<div class="forecast-container">`;
+
+          const currentHour = new Date(data.location.localtime).getHours();
+          const hourly = data.forecast.forecastday[0].hour;
+
+          // Display next 3 hours of forecast
+          for (let i = 1; i <= 3; i++) {
+            const hourIndex = (currentHour + i) % 24;
+            const hourData = hourly[hourIndex];
+            const time = new Date(hourData.time);
+            const hourLabel = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            currentForecastOutput += `
+              <div class="forecast-card">
+                <div class="forecast-time">${hourLabel}</div>
+                <div class="forecast-temp">${hourData.temp_c}°C</div>
+                <img src="${hourData.condition.icon}" alt="${hourData.condition.text}" title="${hourData.condition.text}" />
+                <div class="forecast-condition">${hourData.condition.text}</div>
+              </div>
+            `;
+          }
+          currentForecastOutput += `</div>`;
+          resultDiv.innerHTML = currentForecastOutput;
+
+          // --- 7-Day Forecast ---
+          let sevenDayForecastOutput = '';
+          data.forecast.forecastday.forEach(day => {
+            const date = new Date(day.date);
+            const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+            const avgTemp = day.day.avgtemp_c;
+            const conditionText = day.day.condition.text;
+            const conditionIcon = day.day.condition.icon;
+
+            sevenDayForecastOutput += `
+              <div class="day-forecast-card">
+                <div class="date">${dayName}</div>
+                <img src="${conditionIcon}" alt="${conditionText}" title="${conditionText}" />
+                <div class="avg-temp">${avgTemp}°C</div>
+                <div class="condition">${conditionText}</div>
+              </div>
+            `;
+          });
+          sevenDayForecastDiv.innerHTML = sevenDayForecastOutput;
+
+        })
+        .catch(error => {
+          resultDiv.innerHTML = "⚠️ Could not fetch weather. Try another city.";
+          sevenDayForecastDiv.innerHTML = ""; // Clear 7-day forecast on error
+          console.error("Error:", error);
+        });
+    }
+
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById("liveClock").textContent = `🕒 ${timeStr}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Year in footer
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
