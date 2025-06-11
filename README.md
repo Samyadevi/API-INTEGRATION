@@ -78,3 +78,9 @@ Create the Webpage: Save the provided HTML code as index.html. Open it in a text
 Insert your API Key: Locate const API_KEY = "416570dda2d649bebb6134924250606"; within the <script> tags and replace the placeholder with your actual API key.
 
 Open in browser: Simply double-click index.html. Enter a location (e.g., "Paris") and click "Get Temperature & Forecast".
+
+OUTPUT :
+
+![Image](https://github.com/user-attachments/assets/d2c3f21a-fcdd-4f6f-b627-e165550c58d3)
+
+![Image](https://github.com/user-attachments/assets/de5945b8-c0aa-4053-af53-7965ef63b933)
