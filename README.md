@@ -81,6 +81,6 @@ Open in browser: Simply double-click index.html. Enter a location (e.g., "Paris"
 
 OUTPUT :
 
-![Image](https://github.com/user-attachments/assets/d2c3f21a-fcdd-4f6f-b627-e165550c58d3)
+![Image](https://github.com/user-attachments/assets/2d3583ba-01af-4eb1-8e86-db46dcd508ac)
 
-![Image](https://github.com/user-attachments/assets/de5945b8-c0aa-4053-af53-7965ef63b933)
+![Image](https://github.com/user-attachments/assets/ee31389c-37c9-49a7-8b16-6dad8cba230b)
