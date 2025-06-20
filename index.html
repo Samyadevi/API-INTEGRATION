@@ -3,158 +3,402 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Responsive Weather App</title>
+  <title>Weather Checker</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #83a4d4, #b6fbff);
       margin: 0;
       padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
+      /* Background image from your screenshot example */
+      background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1950&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-y: auto; /* Allow scrolling if content overflows */
     }
+
     header {
-      background-color: #4CAF50;
-      width: 100%;
-      padding: 20px 0;
-      text-align: center;
+      position: absolute;
+      top: 10px;
+      left: 20px;
       color: white;
+      font-size: 1.2rem;
+      z-index: 10; /* Ensure header is on top */
     }
-    main {
-      flex: 1;
+
+    .overlay {
+      background-color: rgba(0, 0, 0, 0.4);
+      min-height: 100vh; /* Use min-height to ensure it covers content even if it expands */
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      padding: 20px;
-      width: 100%;
-      max-width: 600px;
-    }
-    .search-box {
-      display: flex;
-      width: 100%;
-      margin-bottom: 20px;
-    }
-    .search-box input {
-      flex: 1;
-      padding: 10px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px 0 0 5px;
-    }
-    .search-box button {
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      background-color: #4CAF50;
-      color: white;
-      border-radius: 0 5px 5px 0;
-      cursor: pointer;
-    }
-    .search-box button:hover {
-      background-color: #45a049;
-    }
-    .weather-container {
-      background-color: rgba(255, 255, 255, 0.8);
-      padding: 20px;
-      border-radius: 10px;
-      width: 100%;
+      padding: 20px; /* Add padding for smaller screens */
       box-sizing: border-box;
-      display: none;
-      flex-direction: column;
-      align-items: center;
     }
-    .weather-container img {
-      width: 64px;
-      height: 64px;
+
+    .main-content-wrapper {
+      display: flex; /* Use flexbox for main content */
+      flex-direction: column; /* Default to column for small screens */
+      gap: 20px; /* Gap between sections */
+      width: 90%;
+      max-width: 1000px; /* Increased max-width for both containers */
+      /* These styles are for the entire main container, giving it the unified blurred look */
+      background-color: rgba(255, 255, 255, 0.15); /* Slightly more opaque for overall wrapper */
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); /* Stronger shadow */
+      backdrop-filter: blur(10px); /* Main blur */
+      padding: 30px; /* Padding inside the wrapper */
+      box-sizing: border-box;
+      margin: 50px 0; /* Add vertical margin to prevent content from touching header/footer */
     }
-    .weather-details {
-      margin-top: 10px;
+
+    @media (min-width: 768px) {
+      .main-content-wrapper {
+        flex-direction: row; /* Row direction for larger screens */
+        justify-content: space-around;
+        align-items: flex-start; /* Align items to the top */
+      }
     }
+
+    /* Style for the individual left and right boxes */
+    .weather-section, .forecast-section {
+      /* No separate background here, the main-content-wrapper provides it */
+      padding: 25px;
+      border-radius: 15px;
+      color: white;
+      box-sizing: border-box;
+      min-width: 300px;
+    }
+
+    .weather-section {
+      flex: 1; /* Left box takes 1 unit of flexible space */
+      text-align: center;
+    }
+
+    .forecast-section {
+      flex: 1.5; /* Right box takes 1.5 units of flexible space (wider) */
+      text-align: center; /* Center the overall 7-day forecast heading */
+    }
+
+    h1, h2 {
+      color: #ffffff;
+      margin-bottom: 15px;
+    }
+
+    input {
+      padding: 10px;
+      width: calc(100% - 20px); /* Adjust width for padding */
+      border: none;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-size: 1rem;
+      background-color: rgba(255, 255, 255, 0.4); /* Input background */
+      color: #333;
+    }
+    input::placeholder {
+      color: rgba(51, 51, 51, 0.7);
+    }
+
+    button {
+      background-color: #21b5a6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-bottom: 20px; /* Space below the button */
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #009688;
+    }
+
+    .current-weather-info {
+      margin-bottom: 20px; /* Space between current temp and 3-hour forecast */
+    }
+
+    .hourly-forecast-container {
+      display: flex;
+      justify-content: space-around;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+
+    .hourly-forecast-card {
+      background-color: rgba(255, 255, 255, 0.3); /* Card background */
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 100px;
+      backdrop-filter: blur(5px); /* Card blur */
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .hourly-forecast-card img {
+        width: 40px;
+        height: auto;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    .hourly-forecast-time {
+      font-weight: bold;
+      font-size: 1rem;
+      margin-bottom: 5px;
+    }
+
+    .hourly-forecast-temp {
+      font-size: 1.4rem;
+      margin-bottom: 5px;
+    }
+
+    .hourly-forecast-condition {
+      font-size: 0.9rem;
+    }
+
+    .seven-day-cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center; /* Center cards within the container */
+      margin-top: 20px; /* Space below the 7-day forecast heading */
+    }
+
+    .day-forecast-card {
+      background-color: rgba(255, 255, 255, 0.3); /* Card background */
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      /* Adjust width for 3 cards per row, accommodating gaps */
+      width: calc(33.33% - 10px);
+      min-width: 120px; /* Minimum width for responsiveness */
+      backdrop-filter: blur(5px); /* Card blur */
+      color: white;
+      box-sizing: border-box;
+      flex-grow: 1; /* Allow cards to grow if space permits */
+    }
+
+    /* Adjust for 2 cards per row on slightly smaller screens, if desired */
+    @media (max-width: 900px) and (min-width: 768px) {
+        .day-forecast-card {
+            width: calc(50% - 10px); /* 2 cards per row */
+        }
+    }
+
+    /* For very small screens, make cards full width */
+    @media (max-width: 480px) {
+        .day-forecast-card {
+            width: 100%;
+        }
+    }
+
+
+    .day-forecast-card .date {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .day-forecast-card img {
+      width: 50px;
+      height: auto;
+      margin-bottom: 5px;
+    }
+
+    .day-forecast-card .avg-temp {
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+
+    .day-forecast-card .condition {
+      font-size: 0.85rem;
+    }
+
     .error-message {
-      color: red;
-      margin-top: 20px;
+        color: #ffdddd; /* Lighter red for visibility on dark blur */
+        background-color: rgba(255, 0, 0, 0.3);
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 15px;
+        font-weight: bold;
+        display: none; /* Hidden by default */
     }
-    @media (max-width: 600px) {
-      .search-box {
-        flex-direction: column;
-      }
-      .search-box input, .search-box button {
-        width: 100%;
-        border-radius: 5px;
-        margin: 5px 0;
-      }
+
+
+    footer {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      z-index: 10; /* Ensure footer is on top */
     }
   </style>
 </head>
 <body>
-
   <header>
-    <h1>Responsive Weather App</h1>
+    <div id="liveClock">🕒 Loading time...</div>
   </header>
 
-  <main>
-    <div class="search-box">
-      <input type="text" id="cityInput" placeholder="Enter city name" />
-      <button id="searchButton">Get Weather</button>
-    </div>
+  <div class="overlay">
+    <div class="main-content-wrapper">
+      <div class="weather-section">
+        <h1>🌦️ Weather Checker</h1>
+        <p style="font-style: italic; color: #e0f7fa; font-size: 0.95rem;">"Wherever you go, no matter what the weather, always bring your own sunshine."</p>
+        <input type="text" id="locationInput" placeholder="Enter a location (e.g., Paris)" />
+        <button onclick="getWeather()">Get Temperature & Forecast</button>
+        <div id="result" class="current-weather-info">
+          </div>
+        <div id="hourlyForecast" class="hourly-forecast-container">
+            </div>
+        <p class="error-message" id="errorMessage"></p>
+      </div>
 
-    <div class="weather-container" id="weatherContainer">
-      <h2 id="location"></h2>
-      <img id="weatherIcon" src="" alt="Weather Icon" />
-      <div class="weather-details">
-        <p id="condition"></p>
-        <p><strong>Temperature:</strong> <span id="temperature"></span>°C</p>
-        <p><strong>Feels Like:</strong> <span id="feelsLike"></span>°C</p>
-        <p><strong>Humidity:</strong> <span id="humidity"></span>%</p>
-        <p><strong>Wind Speed:</strong> <span id="windSpeed"></span> kph</p>
+      <div class="forecast-section">
+        <h2>7-Day Forecast</h2>
+        <div id="sevenDayForecast" class="seven-day-cards-container">
+          </div>
       </div>
     </div>
+  </div>
 
-    <p class="error-message" id="errorMessage"></p>
-  </main>
+  <footer>
+    © <span id="year"></span> Weatherly · Built with ☀️ by You
+  </footer>
 
   <script>
-    document.getElementById('searchButton').addEventListener('click', getWeather);
+    const API_KEY = "416570dda2d649bebb6134924250606"; // Your API Key
 
-    async function getWeather() {
-      const apiKey = '416570dda2d649bebb6134924250606'; // Replace with your actual API key
-      const city = document.getElementById('cityInput').value.trim();
-      const weatherContainer = document.getElementById('weatherContainer');
-      const errorMessage = document.getElementById('errorMessage');
+    function getWeather() {
+      const location = document.getElementById("locationInput").value.trim();
+      const resultDiv = document.getElementById("result");
+      const hourlyForecastDiv = document.getElementById("hourlyForecast");
+      const sevenDayForecastDiv = document.getElementById("sevenDayForecast");
+      const errorMessageDiv = document.getElementById("errorMessage");
 
-      if (!city) {
-        errorMessage.textContent = 'Please enter a city name.';
-        weatherContainer.style.display = 'none';
+      // Clear previous results and error messages
+      resultDiv.innerHTML = "";
+      hourlyForecastDiv.innerHTML = "";
+      sevenDayForecastDiv.innerHTML = "";
+      errorMessageDiv.textContent = "";
+      errorMessageDiv.style.display = 'none';
+
+
+      if (!location) {
+        errorMessageDiv.textContent = 'Please enter a location.';
+        errorMessageDiv.style.display = 'block';
         return;
       }
 
-      try {
-        errorMessage.textContent = 'Loading...';
-        const response = await fetch(`https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${encodeURIComponent(city)}&aqi=yes`);
-        if (!response.ok) {
-          throw new Error('City not found');
-        }
-        const data = await response.json();
+      // Show loading message (optional)
+      resultDiv.innerHTML = '<p style="color: #e0f7fa;">Loading weather data...</p>';
 
-        document.getElementById('location').textContent = `${data.location.name}, ${data.location.country}`;
-        document.getElementById('weatherIcon').src = `https:${data.current.condition.icon}`;
-        document.getElementById('condition').textContent = data.current.condition.text;
-        document.getElementById('temperature').textContent = data.current.temp_c;
-        document.getElementById('feelsLike').textContent = data.current.feelslike_c;
-        document.getElementById('humidity').textContent = data.current.humidity;
-        document.getElementById('windSpeed').textContent = data.current.wind_kph;
+      // Request 7 days of forecast data
+      const apiUrl = `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${encodeURIComponent(location)}&days=7&aqi=no&alerts=no`;
 
-        weatherContainer.style.display = 'flex';
-        errorMessage.textContent = '';
-      } catch (error) {
-        errorMessage.textContent = 'Error fetching weather data. Please try again.';
-        weatherContainer.style.display = 'none';
-      }
+      fetch(apiUrl)
+        .then(response => {
+          if (!response.ok) {
+            // Check for specific error codes for better messages
+            if (response.status === 400) {
+                throw new Error("Invalid location or API request.");
+            } else if (response.status === 403) {
+                throw new Error("API key invalid or exceeded limits.");
+            } else {
+                throw new Error(`Location not found or other API error (${response.status}).`);
+            }
+          }
+          return response.json();
+        })
+        .then(data => {
+          // --- Current Weather ---
+          const current = data.current;
+          const locationName = data.location.name;
+          const temp = current.temp_c;
+
+          resultDiv.innerHTML = `<p><strong>Current Temperature in ${locationName}</strong>: ${temp}°C</p>`;
+
+          // --- 3-Hour Forecast ---
+          let hourlyOutput = '';
+          const currentHour = new Date(data.location.localtime).getHours();
+          const todayHourly = data.forecast.forecastday[0].hour;
+
+          for (let i = 1; i <= 3; i++) {
+            const hourIndex = (currentHour + i) % 24;
+            const hourData = todayHourly[hourIndex];
+
+            if (hourData) {
+                const time = new Date(hourData.time);
+                const hourLabel = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                hourlyOutput += `
+                  <div class="hourly-forecast-card">
+                    <div class="hourly-forecast-time">${hourLabel}</div>
+                    <div class="hourly-forecast-temp">${hourData.temp_c}°C</div>
+                    <img src="${hourData.condition.icon}" alt="${hourData.condition.text}" title="${hourData.condition.text}" />
+                    <div class="hourly-forecast-condition">${hourData.condition.text}</div>
+                  </div>
+                `;
+            }
+          }
+          hourlyForecastDiv.innerHTML = hourlyOutput;
+
+          // --- 7-Day Forecast ---
+          let sevenDayForecastOutput = '';
+          const forecastDays = data.forecast.forecastday;
+          // Loop through the received forecast days.
+          // WeatherAPI typically returns `days` number of forecastday objects.
+          // Your screenshot shows 6 days, which implies the API is providing 6 forecast objects
+          // even if `days=7` is requested, likely due to free tier limitations.
+          // So, we loop for as many days as are provided by the API in the response.
+          for (let i = 0; i < forecastDays.length; i++) { // Loop through all available forecast days
+            const day = forecastDays[i];
+            const date = new Date(day.date);
+            const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+            const avgTemp = day.day.avgtemp_c;
+            const conditionText = day.day.condition.text;
+            const conditionIcon = day.day.condition.icon;
+
+            sevenDayForecastOutput += `
+              <div class="day-forecast-card">
+                <div class="date">${dayName}</div>
+                <img src="${conditionIcon}" alt="${conditionText}" title="${conditionText}" />
+                <div class="avg-temp">${avgTemp}°C</div>
+                <div class="condition">${conditionText}</div>
+              </div>
+            `;
+          }
+          sevenDayForecastDiv.innerHTML = sevenDayForecastOutput;
+
+        })
+        .catch(error => {
+          errorMessageDiv.textContent = `⚠️ Error: ${error.message}`;
+          errorMessageDiv.style.display = 'block';
+          resultDiv.innerHTML = ""; // Clear loading message
+          hourlyForecastDiv.innerHTML = ""; // Clear hourly forecast
+          sevenDayForecastDiv.innerHTML = ""; // Clear 7-day forecast
+          console.error("Error fetching weather:", error);
+        });
     }
-    
-  </script>
 
+    // Clock
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById("liveClock").textContent = `🕒 ${timeStr}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock(); // Initial call to display clock immediately
+
+    // Year in footer
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
